@@ -8,13 +8,8 @@ guard let fileUrl = Bundle.main.url(forResource: "P1", withExtension: ".txt") el
 let text = try String(contentsOf: fileUrl, encoding: String.Encoding.utf8)
 
 let vals = text.split(separator: "\n")
-
-var p1_list:[Int] = []
-
-for val in vals
-{
-    p1_list.append(Int(val) ?? 0)
-}
+// map to Int
+var p1_list:[Int] = vals.map {Int($0)!}
 
 var increased = 0
 
