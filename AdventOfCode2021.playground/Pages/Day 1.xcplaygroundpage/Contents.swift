@@ -23,6 +23,7 @@ for idx in 1...p1_list.count - 1
         increased += 1
     }
 }
+// get my answer
 print(increased)
 
 // find increased from moving window of three
@@ -40,6 +41,7 @@ for idx in 0...p1_list.count - 1
         increased += 1
     }
 }
+// get my answer
 print(increased)
 
 
