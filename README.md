@@ -1,5 +1,6 @@
-# Advent-of-Code-2021
-My 2021 Advent of Code. My first one!
+# Advent-of-Code
+## 2021
+2021 is my first Advent of Code!
 
 I'm doing the Advent of Code this year with Swift, using [Swift Playgrounds](https://developer.apple.com/swift-playgrounds/) in Xcode.
 
