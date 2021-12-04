@@ -18,9 +18,10 @@ struct BingoBoard
     let numRows = 5
     let numCols = 5
     var board = [[Int]]()
-    private var matched = [[Bool]](repeating: [Bool](repeating: false, count: 5), count: 5)
+    private var matchedArray = [[Bool]](repeating: [Bool](repeating: false, count: 5), count: 5)
     private var matchRowCounts:[Int:Int] = [0: 0, 1: 0, 2: 0, 3: 0, 4: 0]
     private var matchColCounts:[Int:Int] = [0: 0, 1: 0, 2: 0, 3: 0, 4: 0]
+    var lastNum = 0
     var winner: Bool = false
     
     init(boardVal:ArraySlice<String>)
@@ -37,13 +38,14 @@ struct BingoBoard
     mutating func checkNum(num:Int)
     {
         // check to see if the number is on this board.
+        lastNum = num
         for row in 0..<numRows
         {
             for col in 0..<numCols
             {
                 if num == board[row][col]
                 {
-                    matched[row][col] = true
+                    matchedArray[row][col] = true
                     matchColCounts[col]! += 1
                     matchRowCounts[row]! += 1
                 }
@@ -75,16 +77,56 @@ struct BingoBoard
         checkMatchedCounts()
         return winner
     }
+    
+    func getSum() -> Int
+    {
+        // add all numbers from board that were'nt called.
+        var sum = 0
+        for row in 0..<numRows
+        {
+            for col in 0..<numCols
+            {
+                if matchedArray[row][col] == false
+                {
+                    sum += board[row][col]
+                }
+            }
+        }
+        return sum
+    }
 }
 
 // create the boards
-var board = BingoBoard(boardVal: boardData[0])
+var boards = [BingoBoard]()
+
+for idx in 0..<boardData.count
+{
+    boards.append(BingoBoard(boardVal: boardData[idx]))
+}
 
 // check the numbers in the boards. Stop on winner. Get sum.
-board.checkNum(num: 5)
-board.checkNum(num: 31)
-board.checkNum(num: 70)
-board.checkNum(num: 8)
-board.checkNum(num: 88)
-board.isWinner()
+for num in num_seq
+{
+    // need to do this because Swift won't let you mutate the thing after the for statement.
+    var foundWinner = false
+    for (idx, _) in boards.enumerated()
+    {
+        boards[idx].checkNum(num: num)
+        if boards[idx].isWinner()
+        {
+            // we've found our winner, get the sum
+            let sum = boards[idx].getSum()
+            let lastNum = boards[idx].lastNum
+            print("The sum of the winning board is: \(sum) and the winning number was \(lastNum)\tPuzzle Answer: \(sum * lastNum)")
+            // don't need to keep going
+            foundWinner = true
+            break
+        }
+    }
+    // we don't want to keep processing numbers
+    if foundWinner
+    {
+        break
+    }
+}
 //: [Next](@next)
