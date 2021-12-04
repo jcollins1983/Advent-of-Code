@@ -2,8 +2,6 @@
 
 import Cocoa
 
-let file = "P1.txt"
-
 // get file handle
 guard let fileUrl = Bundle.main.url(forResource: "P1", withExtension: ".txt") else { fatalError() }
 // read the file
