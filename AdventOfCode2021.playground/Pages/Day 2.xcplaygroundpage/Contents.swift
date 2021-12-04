@@ -2,8 +2,6 @@
 
 import Foundation
 
-let file = "P2.txt"
-
 // get file handle
 guard let fileUrl = Bundle.main.url(forResource: "P2", withExtension: ".txt") else { fatalError() }
 // read the file
