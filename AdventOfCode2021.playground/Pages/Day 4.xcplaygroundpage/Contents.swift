@@ -49,7 +49,6 @@ struct BingoBoard
                     matchedArray[row][col] = true
                     matchColCounts[col]! += 1
                     matchRowCounts[row]! += 1
-//                    print("Matched @ [\(row)] [\(col)] ")
                 }
             }
         }
@@ -134,6 +133,7 @@ for num in num_seq
 }
 
 // part 2
+// need to reinit the boards from step 1, or comment out the part 1 block, otherwise this block will give rubbish answers...don't ask how lok it too me to work that out... :(
 var lastWinnerIdx = 0
 for num in num_seq
 {
