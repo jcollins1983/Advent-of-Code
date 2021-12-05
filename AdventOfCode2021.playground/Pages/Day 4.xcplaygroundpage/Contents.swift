@@ -38,6 +38,7 @@ struct BingoBoard
     mutating func checkNum(num:Int)
     {
         // check to see if the number is on this board.
+        // record the last number for use with calculating the puzzle solution
         lastNum = num
         for row in 0..<numRows
         {
@@ -48,6 +49,7 @@ struct BingoBoard
                     matchedArray[row][col] = true
                     matchColCounts[col]! += 1
                     matchRowCounts[row]! += 1
+//                    print("Matched @ [\(row)] [\(col)] ")
                 }
             }
         }
@@ -104,6 +106,7 @@ for idx in 0..<boardData.count
     boards.append(BingoBoard(boardVal: boardData[idx]))
 }
 
+// part 1
 // check the numbers in the boards. Stop on winner. Get sum.
 for num in num_seq
 {
