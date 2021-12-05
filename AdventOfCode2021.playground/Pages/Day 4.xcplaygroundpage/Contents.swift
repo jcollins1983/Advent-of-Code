@@ -132,4 +132,26 @@ for num in num_seq
         break
     }
 }
+
+// part 2
+var lastWinnerIdx = 0
+for num in num_seq
+{
+    for idx in 0..<boards.count
+    {
+        // if board is already a winner, we don't need to count it.
+        if !boards[idx].isWinner()
+        {
+            boards[idx].checkNum(num: num)
+            // see if the board is a winner now
+            if boards[idx].isWinner()
+            {
+                lastWinnerIdx = idx
+            }
+        }
+    }
+}
+let sum = boards[lastWinnerIdx].getSum()
+let winningNumber = boards[lastWinnerIdx].lastNum
+print("Last winner is at index: \(lastWinnerIdx)\tSum is: \(sum)\tWinning Number was: \(winningNumber)\tPuzzle solution: \(sum * winningNumber)")
 //: [Next](@next)
