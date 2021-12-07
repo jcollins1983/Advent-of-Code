@@ -48,6 +48,35 @@ for `line` in lines
             grid[px][`line`.y1] += 1
         }
     }
+    else
+    {
+        // we're in a diagonal line.
+        // Δx = Δy, however as x is increasing, y could be increasing or descreasing and vice versa
+        // either need to go from min x and min y up to Δ or start at min x and max y
+        let Δ = (x: `line`.x2 - `line`.x1, y: `line`.y2 - `line`.y1)
+        
+        for oset in 0...abs(Δ.x) // doesn't matter which element we use as they should be the same. but needs to be positive
+        {
+            switch Δ
+            {
+                case let (x, y) where x > 0 && y > 0:
+                    // we're going positive in both directions, so start at x1, y1 and increment each until delta is reached.
+                    grid[`line`.x1 + oset][`line`.y1 + oset] += 1
+                case let (x, y) where x < 0 && y > 0:
+                    // we're going negative in the x direction, so start at x2, y1 and increment each until delta is reached.
+                    grid[`line`.x2 + oset][`line`.y1 + oset] += 1
+                case let (x, y) where x < 0 && y < 0:
+                    // we're going negative in both directions, so start at x2, y2 and increment each until delta is reached.
+                    grid[`line`.x2 + oset][`line`.y2 + oset] += 1
+                case let (x, y) where x > 0 && y < 0:
+                    // we're going negative in the y direction, so start at x1, y2 and increment each until delta is reached.
+                    grid[`line`.x1 + oset][`line`.y2 + oset] += 1
+                default:
+                    break // should never get here.
+                    
+            }
+        }
+    }
 }
 // count the points that were encountered more than once, flatten the grid first, then filter.
 let flatGrid = grid.flatMap { $0 }
