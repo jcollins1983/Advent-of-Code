@@ -6,11 +6,7 @@ guard let fileUrl = Bundle.main.url(forResource: "P5", withExtension: ".txt") el
 // read the file: trying another method this time
 let data = try String(contentsOf: fileUrl, encoding: String.Encoding.utf8).components(separatedBy: .newlines)
 
-// read the lines from data, split on separator -> then split on , in each pair and map to Int followed by assignment to NSPoint in named tuple with p1 and p2 names. There's probably a cleaner way to do this, but it works.
-//let lines = data.map{ (p1:NSPoint(x:$0.components(separatedBy: " -> ")[0].split(separator: ",").map{Int($0)!}[0],
-//                              y:$0.components(separatedBy: " -> ")[0].split(separator: ",").map{Int($0)!}[1]),
-//                       p2:NSPoint(x:$0.components(separatedBy: " -> ")[1].split(separator: ",").map{Int($0)!}[0],
-//                               y:$0.components(separatedBy: " -> ")[1].split(separator: ",").map{Int($0)!}[1]))}
+// read the lines from data, split on separator -> then split on , in each pair and map to Int followed by assignment to point in named tuple with x1, x2, y1, y2 names. There's probably a cleaner way to do this, but it works.
 // split the data into point pairs
 let linesRaw = data.map { $0.components(separatedBy: " -> ") }
 // set up list of named tuples for the points and cast to int.
