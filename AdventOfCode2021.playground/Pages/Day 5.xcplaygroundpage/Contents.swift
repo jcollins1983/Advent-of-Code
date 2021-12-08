@@ -51,33 +51,34 @@ for `line` in lines
     else
     {
         // we're in a diagonal line.
-        // Δx = Δy, however as x is increasing, y could be increasing or descreasing and vice versa
-        // either need to go from min x and min y up to Δ or start at min x and max y
-        let Δ = (x: `line`.x2 - `line`.x1, y: `line`.y2 - `line`.y1)
-        
-        for oset in 0...abs(Δ.x) // doesn't matter which element we use as they should be the same. but needs to be positive
+        let linePoints = getLinePoints(fromLine: `line`)
+        // add the points to the grid
+        for point in linePoints
         {
-            switch Δ
-            {
-                case let (x, y) where x > 0 && y > 0:
-                    // we're going positive in both directions, so start at x1, y1 and increment each until delta is reached.
-                    grid[`line`.x1 + oset][`line`.y1 + oset] += 1
-                case let (x, y) where x < 0 && y > 0:
-                    // we're going negative in the x direction, so start at x2, y1 and increment each until delta is reached.
-                    grid[`line`.x2 + oset][`line`.y1 + oset] += 1
-                case let (x, y) where x < 0 && y < 0:
-                    // we're going negative in both directions, so start at x2, y2 and increment each until delta is reached.
-                    grid[`line`.x2 + oset][`line`.y2 + oset] += 1
-                case let (x, y) where x > 0 && y < 0:
-                    // we're going negative in the y direction, so start at x1, y2 and increment each until delta is reached.
-                    grid[`line`.x1 + oset][`line`.y2 + oset] += 1
-                default:
-                    break // should never get here.
-                    
-            }
+            grid[point.x][point.y] += 1
         }
     }
 }
+
+func getLinePoints(fromLine: (x1:Int, y1:Int, x2:Int, y2:Int)) -> [(x:Int, y:Int)]
+{
+    let xDelta = fromLine.x2 - fromLine.x1
+    let yDelta = fromLine.y2 - fromLine.y1
+    var points = [(x:Int, y:Int)]()
+    
+    // fill the x field. The by parameter will be either 1 or -1 depending on the delta.
+    for val in stride(from: fromLine.x1, through: fromLine.x2, by: xDelta/abs(xDelta))
+    {
+        points.append((x:val, y:0)) // we'll come back to the y values
+    }
+    // now for the x field
+    for (idx, val) in stride(from: fromLine.y1, through: fromLine.y2, by: yDelta/abs(yDelta)).enumerated()
+    {
+        points[idx].y = val
+    }
+    return points
+}
+
 // count the points that were encountered more than once, flatten the grid first, then filter.
 let flatGrid = grid.flatMap { $0 }
 let countGreater2 = flatGrid.filter{ $0 >= 2 }
