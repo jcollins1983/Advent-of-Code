@@ -52,4 +52,5 @@ for pos in crabPositions
     fuelBurn2BruteForce.append(crabPositions.map{ costToMove(from: $0, to: pos) }.reduce(0, +))
 }
 print("Part 2 Brute Force \(fuelBurn2BruteForce.min()!)")
+// there's some derivative tips and tricks to do, but other things.
 //: [Next](@next)
