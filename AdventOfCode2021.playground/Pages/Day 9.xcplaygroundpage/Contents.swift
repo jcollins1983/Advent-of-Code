@@ -45,6 +45,7 @@ struct Grid
     
     mutating func getLowsIndexes() -> [(row:Int, col:Int)]
     {
+        // if we haven't run the findLowsIndexesAndValues method yet, let's do that
         if lowsIndexes.isEmpty
         {
             findLowsIndexesAndValues()
@@ -130,9 +131,9 @@ struct Grid
     
     mutating func getRisk() -> Int
     {
+        // if we haven't run the findLowsIndexesAndValues method yet, let's do that
         if lowsValues.isEmpty
         {
-            // we haven't run findLowsIndexesAndValues
             findLowsIndexesAndValues()
         }
         let risks = lowsValues.map { $0 + 1 }
