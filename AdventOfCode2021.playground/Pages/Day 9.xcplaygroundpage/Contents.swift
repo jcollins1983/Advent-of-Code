@@ -7,6 +7,7 @@ guard let fileUrl = Bundle.main.url(forResource: "P9", withExtension: ".txt") el
 let data = try String(contentsOf: fileUrl, encoding: String.Encoding.utf8).components(separatedBy: .newlines)
 //print(data)
 
+// have to cast the SubString (aka Character) to String before casting to Int, because Swift that's why!
 let grid = data.map{ $0.map{ Int(String($0))! } }
 //print(grid)
 
