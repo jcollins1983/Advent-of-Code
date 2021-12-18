@@ -20,6 +20,8 @@ struct Grid
     private var lowsIndexes = [(row:Int, col:Int)]()
     private var lowsValues = [Int]()
     private var grid = [[Int]]()
+    // Part 2 variable
+    private var basinSizes = [Int]()
     
     init(gridData:[[Int]])
     {
@@ -140,9 +142,73 @@ struct Grid
         return risks.reduce(0, +)
     }
     
+    // Part 2 additions
+    mutating func getBasinSizes() -> [Int]
+    {
+        // if we haven't run findLowsIdexesAndValues before, let's do it now.
+        if lowsIndexes.isEmpty
+        {
+            findLowsIndexesAndValues()
+        }
+        findBasinSizes()
+        return basinSizes
+    }
+    
+    private mutating func findBasinSizes()
+    {
+        for low in lowsIndexes
+        {
+            basinSizes.append(countBasin(idx: low))
+        }
+    }
+    // using flood-fill / boundary fill https://www.freecodecamp.org/news/flood-fill-algorithm-explained/
+    private mutating func countBasin(idx:(row:Int, col:Int)) -> Int
+    {
+        let countedVal = 10 // mark counted basin values with 10
+        var count = 0
+        let val = grid[idx.row][idx.col]
+        // we're at a boundary or we've been counted before, return 0
+        if val == 9 || val == countedVal
+        {
+            return 0
+        }
+        // we'll count it
+        count += 1
+        // and mark it
+        grid[idx.row][idx.col] = countedVal
+        
+        // if we're in from the left boundary we can search left
+        if idx.row > 0
+        {
+            count += countBasin(idx: (row: idx.row - 1, col: idx.col))
+        }
+        // if we're in from the right boundary we can search right
+        if (idx.row < (rows - 1))
+        {
+            count += countBasin(idx: (row: idx.row + 1, col: idx.col))
+        }
+        // if we're in from the upper boundary we can search up
+        if idx.col > 0
+        {
+            count += countBasin(idx: (row: idx.row, col: idx.col - 1))
+        }
+        // if we're in from the upper boundary we can search down
+        if idx.col < (cols - 1)
+        {
+            count += countBasin(idx: (row: idx.row, col: idx.col + 1))
+        }
+        
+        return count
+    }
 }
 
 var myGrid = Grid(gridData: grid)
 let risk = myGrid.getRisk()
 print("Part 1: \(risk)")
+// Part 2
+let basinSizes = myGrid.getBasinSizes()
+// sort the the basin sizes from largest to smallest, then take the first 3 elements and multiply them (note: you need to have an initial value with one for reduce when multiplying, otherwise you will always get 0... which took me longer than I care to admit to work out... :( )
+print("\(basinSizes.sorted() { $0 > $1 }[0...2].reduce(1, { $0 * $1}))")
+
+//print(basinSizes)
 //: [Next](@next)
