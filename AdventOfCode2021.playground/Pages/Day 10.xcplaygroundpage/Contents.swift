@@ -13,18 +13,22 @@ struct Syntax
     let openChars:[Character] = ["(", "{", "[", "<"]
     let closeChars:[Character] = [")", "}", "]", ">"]
     // map open with closed and closed with open to map both ways
-    let charPairsMap:[Character:Character] = ["(": ")", "{": "}", "<": ">", ")": "(", "}": "{", "]": "[", ">": "<"]
+    let charPairsMap:[Character:Character] = ["(": ")", "[": "]", "{": "}", "<": ">", ")": "(", "}": "{", "]": "[", ">": "<"]
     let errorPointMap:[Character:Int] = [")": 3, "]": 57, "}": 1197, ">": 25137]
+    // part 2 addition
+    let completionPointMap:[Character:Int] = [")": 1, "]": 2, "}": 3, ">": 4]
 }
 
 // common code
-func checkSyntax(line ln:String) -> (syntaxOk: Bool, idxOfError: Int?, errorChar: Character?)
+func checkSyntax(line ln:String) -> (syntaxOk: Bool, idxOfError: Int?, errorChar: Character?, incompleteSequence: [Character]?)
 {
     // start out with true, and change if error is found, and idxOfError starts as nil
     var syntaxResult = true
     var idxOfError:Int? = nil
     var openChars = [Character]()
     var errorChar:Character? = nil
+    // Part 2 addition
+    var incompleteSequence:[Character]? = nil
     
     for (idx, char) in ln.enumerated()
     {
@@ -41,7 +45,7 @@ func checkSyntax(line ln:String) -> (syntaxOk: Bool, idxOfError: Int?, errorChar
                     syntaxResult = false
                     idxOfError = idx
                     errorChar = char
-                    return (syntaxResult, idxOfError, errorChar)
+                    return (syntaxResult, idxOfError, errorChar, incompleteSequence)
                 }
             case 1...:
                 if Syntax().openChars.contains(char)
@@ -64,7 +68,7 @@ func checkSyntax(line ln:String) -> (syntaxOk: Bool, idxOfError: Int?, errorChar
                         syntaxResult = false
                         idxOfError = idx
                         errorChar = char
-                        return (syntaxResult, idxOfError, errorChar)
+                        return (syntaxResult, idxOfError, errorChar, incompleteSequence)
                     }
                 }
             default:
@@ -72,12 +76,35 @@ func checkSyntax(line ln:String) -> (syntaxOk: Bool, idxOfError: Int?, errorChar
                 break
         }
     }
-    
-    return (syntaxOk: syntaxResult, idxOfError: idxOfError, errorChar: errorChar)
+    // if we get there the syntax is ok, need to return the incomplete sequence, if there was any incompleteness
+    if !openChars.isEmpty
+    {
+        incompleteSequence = openChars
+    }
+    return (syntaxOk: syntaxResult, idxOfError: idxOfError, errorChar: errorChar, incompleteSequence)
 }
 
-// Part 1
+// Part 2 addition
+func completionSequence(incompleteSeq seq: [Character]) -> [Character]
+{
+    // return the seqeuence reverse and mapped to the closing characters
+    return seq.reversed().map { Syntax().charPairsMap[$0]! }
+}
+
+func scoreCompletion(sequence seq: [Character]) -> Int
+{
+    var totalScore = 0
+    for char in seq
+    {
+        totalScore = totalScore * 5 + Syntax().completionPointMap[char]!
+    }
+    return totalScore
+}
+
+// Part 1 & Part 2 interweaved
 var errorPoints = 0
+// Part 2 addition
+var completionScores = [Int]()
 for line in data
 {
     let check = checkSyntax(line: line)
@@ -86,7 +113,16 @@ for line in data
         // we found a problem, add the error value
         errorPoints += Syntax().errorPointMap[check.errorChar!]!
     }
+    // Part 2 addition
+    else if check.incompleteSequence != nil
+    {
+        // syntax was ok, and incompleteSequence exists
+        completionScores.append(scoreCompletion(sequence: completionSequence(incompleteSeq: check.incompleteSequence!)))
+    }
 }
 print("Part 1: Error value = \(errorPoints)")
 
+let sortedScores = completionScores.sorted()
+let middleScore = sortedScores[(sortedScores.count - 1) / 2]
+print("Part 2: Completion Score: \(middleScore)")
 //: [Next](@next)
