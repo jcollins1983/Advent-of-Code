@@ -49,7 +49,6 @@ struct Grid
     private mutating func incrementNeighbours(idx: (row: Int, col: Int))
     {
         // if we're on a boundary we can't increment in all directions
-        // note, this is Xcodes formatting and it looks like balls!
         switch idx
         {
             case (0, 0):
