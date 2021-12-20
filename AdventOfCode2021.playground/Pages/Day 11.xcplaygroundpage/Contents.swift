@@ -46,99 +46,159 @@ struct Grid
         grid = grid.map { $0.map { $0 + 1 } }
     }
     
-    private mutating func incrementNeighbours(idx: (row: Int, col: Int))
+    private mutating func incrementElement(row: Int, col:Int)
     {
-        // if we're on a boundary we can't increment in all directions
+        // increment an element only if it is not 0
+        if grid[row][col] == 0
+        {
+            return
+        }
+        else
+        {
+            grid[row][col] += 1
+        }
+    }
+    
+    private mutating func doFlash(idx: (row: Int, col: Int))
+    {
+        // if we've already flashed, we don't want to flash again OR if we're not at a flash level
+        if grid[idx.row][idx.col] == 0 || grid[idx.row][idx.col] <= 9
+        {
+            return
+        }
+        // count the flash, then set the value to 0
+        numFlashes += 1
+        grid[idx.row][idx.col] = 0
+        
+        // if we're on a boundary we can't increment in all directions, then process any flashes.
         switch idx
         {
             case (0, 0):
                 // we're on the upper left boundary, increment right, down and down/right
-                grid[idx.row][idx.col + 1] += 1  // right
-                grid[idx.row + 1][idx.col + 1] += 1 // down/right
-                grid[idx.row + 1][idx.col] += 1 // down
+                incrementElement(row: idx.row, col: idx.col + 1)  // right
+                incrementElement(row: idx.row + 1, col: idx.col + 1) // down/right
+                incrementElement(row: idx.row + 1, col: idx.col) // down
+                doFlash(idx: (idx.row, idx.col + 1))
+                doFlash(idx: (idx.row + 1, idx.col + 1))
+                doFlash(idx: (idx.row + 1, idx.col + 1))
             case (0, cols - 1):
                 // we're on the upper right boundary, increment left, down and down/left
-                grid[idx.row][idx.col - 1] += 1 // left
-                grid[idx.row + 1][idx.col - 1] += 1 // down/left
-                grid[idx.row + 1][idx.col] += 1 // down
+                incrementElement(row: idx.row, col: idx.col - 1) // left
+                incrementElement(row: idx.row + 1, col: idx.col - 1) // down/left
+                incrementElement(row: idx.row + 1, col: idx.col) // down
+                doFlash(idx: (idx.row, idx.col - 1))
+                doFlash(idx: (idx.row + 1, idx.col - 1))
+                doFlash(idx: (idx.row + 1, idx.col))
             case (rows - 1, 0):
                 // we're on the lower left boundary, increment right, up and up/right
-                grid[idx.row][idx.col + 1] += 1 // right
-                grid[idx.row - 1][idx.col + 1] += 1 // up/right
-                grid[idx.row - 1][idx.col] += 1 // up
+                incrementElement(row: idx.row, col: idx.col + 1) // right
+                incrementElement(row: idx.row - 1, col: idx.col + 1) // up/right
+                incrementElement(row: idx.row - 1, col: idx.col) // up
+                doFlash(idx: (idx.row, idx.col + 1))
+                doFlash(idx: (idx.row - 1, idx.col + 1))
+                doFlash(idx: (idx.row - 1, idx.col))
             case (rows - 1, cols - 1):
                 // we're on the lower right boundary, increment left, up and up/left
-                grid[idx.row][idx.col - 1] += 1 // left
-                grid[idx.row - 1][idx.col - 1] += 1 // up/left
-                grid[idx.row - 1][idx.col] += 1 // up
-            case let (row, col) where row == 0 && col > 0 && col < (cols - 2):
+                incrementElement(row: idx.row, col: idx.col - 1) // left
+                incrementElement(row: idx.row - 1, col: idx.col - 1) // up/left
+                incrementElement(row: idx.row - 1, col: idx.col) // up
+                doFlash(idx: (idx.row, idx.col - 1))
+                doFlash(idx: (idx.row - 1, idx.col - 1))
+                doFlash(idx: (idx.row - 1, idx.col))
+            case let (row, col) where row == 0 && col > 0 && col < (cols - 1):
                 // we're on the top row between the corners, we can go left, right, down, down/right, down/left
-                grid[idx.row][idx.col - 1] += 1 // left
-                grid[idx.row][idx.col + 1] += 1 // right
-                grid[idx.row + 1][idx.col] += 1 // down
-                grid[idx.row + 1][idx.col + 1] += 1 // down/right
-                grid[idx.row + 1][idx.col - 1] += 1 // down/left
-            case let (row, col) where col == (cols - 1) && row > 0 && row < (rows - 2):
+                incrementElement(row: idx.row, col: idx.col - 1) // left
+                incrementElement(row: idx.row, col: idx.col + 1) // right
+                incrementElement(row: idx.row + 1, col: idx.col) // down
+                incrementElement(row: idx.row + 1, col: idx.col + 1) // down/right
+                incrementElement(row: idx.row + 1, col: idx.col - 1) // down/left
+                doFlash(idx: (idx.row, idx.col - 1))
+                doFlash(idx: (idx.row, idx.col + 1))
+                doFlash(idx: (idx.row + 1, idx.col))
+                doFlash(idx: (idx.row + 1, idx.col + 1))
+                doFlash(idx: (idx.row + 1, idx.col - 1))
+            case let (row, col) where col == (cols - 1) && row > 0 && row < (rows - 1):
                 // we're on the right column between the corners, we can go left, up, down, up/left, down/left
-                grid[idx.row][idx.col - 1] += 1 // left
-                grid[idx.row - 1][idx.col] += 1 // up
-                grid[idx.row + 1][idx.col] += 1 // down
-                grid[idx.row + 1][idx.col - 1] += 1 // down/left
-                grid[idx.row - 1][idx.col - 1] += 1 // up/left
-            case let (row, col) where row == (rows - 1) && col > 0 && col < (cols - 2):
+                incrementElement(row: idx.row, col: idx.col - 1) // left
+                incrementElement(row: idx.row - 1, col: idx.col) // up
+                incrementElement(row: idx.row + 1, col: idx.col) // down
+                incrementElement(row: idx.row + 1, col: idx.col - 1) // down/left
+                incrementElement(row: idx.row - 1, col: idx.col - 1) // up/left
+                doFlash(idx: (idx.row, idx.col - 1))
+                doFlash(idx: (idx.row - 1, idx.col))
+                doFlash(idx: (idx.row + 1, idx.col))
+                doFlash(idx: (idx.row + 1, idx.col - 1))
+                doFlash(idx: (idx.row - 1, idx.col - 1))
+            case let (row, col) where row == (rows - 1) && col > 0 && col < (cols - 1):
                 // we're on the bottom row between the corners, we can go left, right, up, up/right, up/left
-                grid[idx.row][idx.col - 1] += 1 // left
-                grid[idx.row][idx.col + 1] += 1 // right
-                grid[idx.row - 1][idx.col] += 1 // up
-                grid[idx.row - 1][idx.col + 1] += 1 // up/right
-                grid[idx.row - 1][idx.col - 1] += 1 // up/left
-            case let (row, col) where col == 0 && row > 0 && row < (rows - 2):
+                incrementElement(row: idx.row, col: idx.col - 1) // left
+                incrementElement(row: idx.row, col: idx.col + 1) // right
+                incrementElement(row: idx.row - 1, col: idx.col) // up
+                incrementElement(row: idx.row - 1, col: idx.col + 1) // up/right
+                incrementElement(row: idx.row - 1, col: idx.col - 1) // up/left
+                doFlash(idx: (idx.row, idx.col - 1))
+                doFlash(idx: (idx.row, idx.col + 1))
+                doFlash(idx: (idx.row - 1, idx.col))
+                doFlash(idx: (idx.row - 1, idx.col + 1))
+                doFlash(idx: (idx.row - 1, idx.col - 1))
+            case let (row, col) where col == 0 && row > 0 && row < (rows - 1):
                 // we're on the left column between the corners, we can go up, right, down, up/right, down/right
-                grid[idx.row - 1][idx.col] += 1 // up
-                grid[idx.row][idx.col + 1] += 1 // right
-                grid[idx.row + 1][idx.col] += 1 // down
-                grid[idx.row - 1][idx.col + 1] += 1 // up/right
-                grid[idx.row + 1][idx.col + 1] += 1 // down/right
+                incrementElement(row: idx.row - 1, col: idx.col) // up
+                incrementElement(row: idx.row, col: idx.col + 1) // right
+                incrementElement(row: idx.row + 1, col: idx.col) // down
+                incrementElement(row: idx.row - 1, col: idx.col + 1) // up/right
+                incrementElement(row: idx.row + 1, col: idx.col + 1) // down/right
+                doFlash(idx: (idx.row - 1, idx.col))
+                doFlash(idx: (idx.row, idx.col + 1))
+                doFlash(idx: (idx.row + 1, idx.col))
+                doFlash(idx: (idx.row - 1, idx.col + 1))
+                doFlash(idx: (idx.row + 1, idx.col + 1))
             case let (row, col) where row > 0 && row < (rows - 1) && col > 0 && col < (cols - 1):
                 // in the middle somewhere, increment in all directions
-                grid[idx.row - 1][idx.col] += 1 // up
-                grid[idx.row - 1][idx.col + 1] += 1 // up/right
-                grid[idx.row - 1][idx.col - 1] += 1 // up/left
-                grid[idx.row + 1][idx.col] += 1 // down
-                grid[idx.row + 1][idx.col + 1] += 1 // down/right
-                grid[idx.row + 1][idx.col - 1] += 1 // down/left
-                grid[idx.row][idx.col + 1] += 1 // right
-                grid[idx.row][idx.col - 1] += 1 // left
+                incrementElement(row: idx.row - 1, col: idx.col) // up
+                incrementElement(row: idx.row - 1, col: idx.col + 1) // up/right
+                incrementElement(row: idx.row - 1, col: idx.col - 1) // up/left
+                incrementElement(row: idx.row + 1, col: idx.col) // down
+                incrementElement(row: idx.row + 1, col: idx.col + 1) // down/right
+                incrementElement(row: idx.row + 1, col: idx.col - 1) // down/left
+                incrementElement(row: idx.row, col: idx.col + 1) // right
+                incrementElement(row: idx.row, col: idx.col - 1) // left
+                doFlash(idx: (idx.row - 1, idx.col))
+                doFlash(idx: (idx.row - 1, idx.col + 1))
+                doFlash(idx: (idx.row - 1, idx.col - 1))
+                doFlash(idx: (idx.row + 1, idx.col))
+                doFlash(idx: (idx.row + 1, idx.col + 1))
+                doFlash(idx: (idx.row + 1, idx.col - 1))
+                doFlash(idx: (idx.row, idx.col + 1))
+                doFlash(idx: (idx.row, idx.col - 1))
             default:
-                print("Something went wrong!")
+                print("Something went wrong! \(idx)")
                 break
         }
     }
     
-    private mutating func doFlash()
+    func getFlashes() -> Int
     {
-        // starting at the top left, check the value and process the flash if necessary
-//        for row in 0..<rows
-//        {
-//
-//        }
-        // count the flash
-        numFlashes += 1
-        // set back to 0
-//        grid[idx.row][idx.col] = 0
-        
+        return numFlashes
     }
     
     mutating func runStep()
     {
         incrementGrid()
-        self.printGrid()
-        incrementNeighbours(idx: (4, 5))
-        self.printGrid()
+        for row in 0..<rows
+        {
+            for col in 0..<cols
+            {
+                doFlash(idx: (row, col))
+            }
+        }
     }
 }
 
 var myGrid = Grid(gridData: grid)
-myGrid.printGrid()
-myGrid.runStep()
+for _ in 0..<100
+{
+    myGrid.runStep()
+}
+print("Part 1: number of flashes was \(myGrid.getFlashes())")
 //: [Next](@next)
